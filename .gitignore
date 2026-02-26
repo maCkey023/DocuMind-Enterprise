@@ -1,0 +1,17 @@
+# --- Backend ---
+**/__pycache__/
+**/*.py[cod]
+**/.env
+**/data/*
+!**/data/.gitkeep
+
+# --- Frontend ---
+**/node_modules/
+**/dist/
+**/.DS_Store
+frontend/.env
+
+# --- Local & IDE ---
+.vscode/
+.idea/
+.env
