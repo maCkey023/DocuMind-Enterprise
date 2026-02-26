@@ -1,0 +1,7 @@
+langchain
+langchain-openai
+langchain-pinecone
+langchain-unstructured
+unstructured[pdf]
+python-dotenv
+pinecone-client
