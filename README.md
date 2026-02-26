@@ -9,22 +9,40 @@
 
 ---
 
+## 🖼️ Project Showcase
+
+### 01. Intuitive Landing Experience
+The "Midnight Aurora" theme provides a clean, focused environment for enterprise document analysis.
+![Landing Page](./assets/01-landing-page.png)
+
+### 02. Seamless Data Ingestion
+Successfully process and vectorize complex enterprise documents into the Pinecone database with real-time feedback.
+![Data Ingestion](./assets/02-data-ingestion.png)
+
+### 03. Precision RAG with Paged Citations
+Get accurate answers with clickable citations that point directly to the source page, ensuring data transparency.
+![Citations](./assets/04-paged-citations.png)
+
+### 04. Advanced Database Control & Privacy
+Manage your vector index with security-first features like "Brain Wipe" and full database purging.
+![Database Management](./assets/05-database-management.png)
+
+---
+
 ## 📂 Project Architecture
-
-
 
 ### Backend (FastAPI)
 A modular architecture built for scalability and separation of concerns.
-- **`main.py`**: Entry point, CORS configuration, and route registration.
+- **`documind_enterprise_backend/main.py`**: Entry point and route registration.
 - **`api/`**: Contains `chat_routes.py` for streaming and `doc_routes.py` for indexing.
-- **`services/`**: Houses `chat_engine.py` (RAG logic), `ingest_engine.py` (PDF parsing), and `memory.py` (Session storage).
+- **`services/`**: Houses `chat_engine.py` (RAG logic) and `ingest_engine.py` (PDF parsing).
 - **`schemas/`**: Pydantic models for strict API request validation.
 
 ### Frontend (React + Vite)
-A minimalist, Gemini-inspired UI with a collapsible sidebar and dark "Midnight Aurora" theme.
-- **`App.jsx`**: Manages global state including sessions, themes, and sidebar toggles.
-- **`Sidebar.jsx`**: Handles document uploads and session history.
-- **`ChatWindow.jsx`**: Features real-time streaming, Markdown rendering, and auto-scroll.
+A minimalist, Gemini-inspired UI with a dark "Midnight Aurora" theme.
+- **`documind_enterprise_frontend/src/App.jsx`**: Manages global state and sidebar toggles.
+- **`components/Sidebar.jsx`**: Handles document uploads and session history.
+- **`components/ChatWindow.jsx`**: Features real-time streaming and Markdown rendering.
 
 ---
 
