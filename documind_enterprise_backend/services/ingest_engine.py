@@ -37,6 +37,13 @@ def ingest_document(file_path: str = "./data/corporate_policy.pdf"):
         documents = loader.load()
         logger.info(f"Successfully loaded {len(documents)} pages.")
 
+        # 4. PRE-PROCESSING: Inject page numbers into the text content
+        for doc in documents:
+            page_num = doc.metadata.get("page_number", "Unknown")
+            # We add a header to the text so the AI knows exactly which page it's reading
+            doc.page_content = f"--- SOURCE: PAGE {page_num} ---\n{doc.page_content}"
+
+
         # 4. Advanced Chunking Strategy
         logger.info("Chunking text to preserve context...")
         text_splitter = RecursiveCharacterTextSplitter(

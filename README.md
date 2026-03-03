@@ -19,13 +19,21 @@ The "Midnight Aurora" theme provides a clean, focused environment for enterprise
 Successfully process and vectorize complex enterprise documents into the Pinecone database with real-time feedback.
 ![Data Ingestion](./assets/02-data-ingestion.png)
 
-### 03. Precision RAG with Paged Citations
-Get accurate answers with clickable citations that point directly to the source page, ensuring data transparency.
-![Citations](./assets/04-paged-citations.png)
+### 03. Interactive Chat Interface
+Engage with the uploaded documents using a responsive, real-time conversational interface.
+![Chat Interface](./assets/03-chat-interface.png)
 
-### 04. Advanced Database Control & Privacy
-Manage your vector index with security-first features like "Brain Wipe" and full database purging.
+### 04. Multi-Source Context Retrieval
+The advanced vector engine retrieves up to 4 distinct document chunks (k=4) per query. It synthesizes complex answers while maintaining strict zero-hallucination guardrails, providing consolidated, clickable page citations for total data transparency.
+![Paged Citations](./assets/04-paged-citations.png)
+
+### 05. Advanced Database Control
+Manage your vector index directly from the UI with security-first features like full database purging.
 ![Database Management](./assets/05-database-management.png)
+
+### 06. Session Privacy & Memory Wipe
+Instantly clear session history and context with a single click to ensure data privacy between different document queries.
+![Memory Wipe](./assets/06-memory-wipe.png)
 
 ---
 
