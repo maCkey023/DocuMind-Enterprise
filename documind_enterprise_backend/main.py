@@ -2,11 +2,20 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import our new modular routers
-from api.chat_routes import router as chat_router
+# Import slowapi exception handlers
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
+# Import our new modular routers AND the limiter
+from api.chat_routes import router as chat_router, limiter
 from api.doc_routes import router as doc_router
 
 app = FastAPI(title="DocuMind Enterprise API")
+
+# --- RATE LIMITER SETUP ---
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# --------------------------
 
 # Configure CORS
 app.add_middleware(

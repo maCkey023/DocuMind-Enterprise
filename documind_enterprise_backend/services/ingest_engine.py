@@ -1,7 +1,6 @@
 import os
 import logging
 from dotenv import load_dotenv
-# 1. CHANGED: Import UnstructuredPDFLoader as mandated by the project memo
 from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -26,13 +25,11 @@ def ingest_document(file_path: str = "./data/corporate_policy.pdf"):
         pc = Pinecone(api_key=PINECONE_API_KEY)
         index = pc.Index(INDEX_NAME)
 
-        # Using the free, local fallback model approved in the memo
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
         # 3. Load PDF and Extract Metadata using Unstructured
         logger.info(f"Loading document: {file_path}")
 
-        # THE FIX 1: Changed to mode="paged" to keep the pages separated!
         loader = UnstructuredPDFLoader(file_path, mode="paged")
         documents = loader.load()
         logger.info(f"Successfully loaded {len(documents)} pages.")
@@ -40,7 +37,6 @@ def ingest_document(file_path: str = "./data/corporate_policy.pdf"):
         # 4. PRE-PROCESSING: Inject page numbers into the text content
         for doc in documents:
             page_num = doc.metadata.get("page_number", "Unknown")
-            # We add a header to the text so the AI knows exactly which page it's reading
             doc.page_content = f"--- SOURCE: PAGE {page_num} ---\n{doc.page_content}"
 
 

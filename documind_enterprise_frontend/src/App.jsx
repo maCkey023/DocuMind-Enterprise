@@ -106,6 +106,26 @@ export default function App() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage, session_id: currentSessionId })
       });
+
+      // --- ADDED RATE LIMIT CHECK HERE ---
+      if (response.status === 429) {
+        alert("Whoa there! DocuMind needs a break. Please wait a minute before asking another question.");
+
+        // Remove the empty AI message we optimistically added so the UI doesn't look weird
+        setSessions((prev) => prev.map(s => {
+          if (s.id === currentSessionId) {
+            const cleanedMessages = [...s.messages];
+            cleanedMessages.pop(); // Remove the empty AI bubble
+            return { ...s, messages: cleanedMessages };
+          }
+          return s;
+        }));
+
+        setIsLoading(false);
+        return; // Stop the function completely
+      }
+      // -----------------------------------
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
 

@@ -22,8 +22,11 @@ def build_chat_chain():
         namespace="corporate-policies-v1" 
     )
     
-    # FIX 1: Increased 'k' to 4 so the AI has enough context to avoid hallucinating
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+    # FIX: Added similarity score threshold to drop completely irrelevant chunks!
+    retriever = vectorstore.as_retriever(
+        search_type="similarity_score_threshold",
+        search_kwargs={"k": 4, "score_threshold": 0.5}
+    )
 
     # 2. Connect to Groq/Llama-3 (Your Brain's Voice)
     llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0)
@@ -45,12 +48,15 @@ def build_chat_chain():
 
     # 4. Setup The Guardrails (The Fix!)
     system_prompt = (
-        "You are DocuMind, an elite enterprise AI assistant. Your sole purpose is to analyze the provided corporate documents.\n\n"
-        "STRICT GUARDRAIL PROTOCOL:\n"
-        "1. ZERO HALLUCINATION: You must ONLY use the information explicitly found in the Context below. Do not use outside knowledge.\n"
-        "2. IF UNKNOWN: If the Context does not contain the answer, you must output EXACTLY: 'The provided document protocol does not contain specific information regarding this query.' Do not attempt to guess or apologize.\n"
-        "3. CONSOLIDATED CITATIONS: If you find the answer, provide a clear, professional response. Consolidate any page numbers at the very end of your response on a single new line like this: '\n\nSources: Page X, Page Y'. Do NOT scatter page numbers throughout the text.\n\n"
-        "Context:\n{context}"
+        "You are DocuMind, a strict enterprise data-extraction AI.\n"
+        "WARNING: You are operating in a ZERO-TOLERANCE HALLUCINATION environment.\n\n"
+        "CRITICAL RULES:\n"
+        "1. You may ONLY answer using the information provided in the <context> block below. You are allowed to summarize and synthesize the context to answer the user's prompt.\n"
+        "2. If the <context> block is empty, or if the user's question cannot be reasonably answered using the <context>, you MUST reply EXACTLY with: 'The provided document protocol does not contain specific information regarding this query.'\n"
+        "3. NEVER use your outside general knowledge. NEVER apologize.\n\n"
+        "<context>\n"
+        "{context}\n"
+        "</context>"
     )
     
     qa_prompt = ChatPromptTemplate.from_messages([

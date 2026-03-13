@@ -1,27 +1,33 @@
 import json
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from langchain_core.messages import HumanMessage, AIMessage
 
 from schemas.requests import ChatRequest
 from services.chat_engine import build_chat_chain
 from services.memory import chat_sessions
 
+# Initialize the limiter tracking by IP address
+limiter = Limiter(key_func=get_remote_address)
+
 router = APIRouter()
 chat_chain = build_chat_chain()
 
 @router.post("/chat")
-async def chat_endpoint(request: ChatRequest):
+@limiter.limit("5/minute")
+async def chat_endpoint(request: Request, payload: ChatRequest):
     async def stream_generator():
         full_answer = ""
         citations = []
         
         # Grab the specific memory for THIS chat session
-        current_history = chat_sessions.get(request.session_id, [])
+        current_history = chat_sessions.get(payload.session_id, [])
 
         try:
             async for chunk in chat_chain.astream({
-                "input": request.message,
+                "input": payload.message,
                 "chat_history": current_history 
             }):
                 if "context" in chunk:
@@ -37,14 +43,27 @@ async def chat_endpoint(request: ChatRequest):
                     yield f"data: {json.dumps({'token': token})}\n\n"
 
             unique_citations = list(set(citations))
-            yield f"data: {json.dumps({'citations': unique_citations})}\n\n"
+            
+            # --- SMART FILTER FIX ---
+            # Only keep the blue chip if the LLM actually cited that specific "Page X" in its text answer
+            smart_citations = []
+            for cite in unique_citations:
+                page_identifier = cite.split(" - ")[0] # Extracts just "Page 1", "Page 52", etc.
+                if page_identifier in full_answer:
+                    smart_citations.append(cite)
+            
+            # Fallback: If the filter catches nothing, just show them all
+            final_citations = smart_citations if smart_citations else unique_citations
+            # ------------------------
+            
+            yield f"data: {json.dumps({'citations': final_citations})}\n\n"
 
             # Save the updated conversation back to this specific session ID
             current_history.extend([
-                HumanMessage(content=request.message),
+                HumanMessage(content=payload.message),
                 AIMessage(content=full_answer)
             ])
-            chat_sessions[request.session_id] = current_history
+            chat_sessions[payload.session_id] = current_history
 
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
